@@ -21,9 +21,9 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import { TouchableRipple } from 'react-native-paper';
 import DatePicker from 'react-native-date-picker'
-import { ResetButton } from '../uis/resetButton';
+import { ResetButton } from '../../uis/resetButton';
 
-import { SubmitButton } from '../uis/submitButton';
+import { SubmitButton } from '../../uis/submitButton';
 
 export const AddWeekendScreen = ({ navigation }) => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -46,14 +46,14 @@ export const AddWeekendScreen = ({ navigation }) => {
             </View>
             
             <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Image source={require('../icons/calendar.png')} style={{ width: 30, height: 30 }} />
+                <Image source={require('../../icons/calendar.png')} style={{ width: 30, height: 30 }} />
                 <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenSDP(true)}>
                     <Text style={{alignSelf: 'flex-start'}} >{finalyStartDate.length != 0 ? finalyStartDate : 'Установите дату начала'}</Text>
                 </TouchableRipple>
             </View>
 
             <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Image source={require('../icons/calendar.png')} style={{ width: 30, height: 30 }} />
+                <Image source={require('../../icons/calendar.png')} style={{ width: 30, height: 30 }} />
                 <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenEDP(true)}>
                     <Text style={{alignSelf: 'flex-start'}} >{finalyEndDate.length != 0 ? finalyEndDate : 'Установите дату конца'}</Text>
                 </TouchableRipple>

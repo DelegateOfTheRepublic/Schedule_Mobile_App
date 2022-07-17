@@ -16,7 +16,7 @@ import {
     Colors
 } from 'react-native/Libraries/NewAppScreen';
 
-import { AddButton } from '../uis/addButton';
+import { AddButton } from '../../uis/addButton';
 
 export const ClassroomsScreen = ({ navigation }) => {
     const isDarkMode = useColorScheme() === 'dark';

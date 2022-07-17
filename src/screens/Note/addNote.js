@@ -23,9 +23,9 @@ import { TouchableRipple } from 'react-native-paper';
 import {
     Colors
 } from 'react-native/Libraries/NewAppScreen';
-import { ResetButton } from '../uis/resetButton';
+import { ResetButton } from '../../uis/resetButton';
 
-import { SubmitButton } from '../uis/submitButton';
+import { SubmitButton } from '../../uis/submitButton';
 
 export const AddNoteScreen = ({ navigation }) => {
     const data = [
@@ -121,7 +121,7 @@ export const AddNoteScreen = ({ navigation }) => {
                     <Text style={{alignSelf: 'flex-end'}} >{subject != null ? subject.label.length : 0}/256</Text>
                 </View>
                 <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Image source={require('../icons/fast-time.png')} style={{ width: 30, height: 30, borderRadius: 15 }}/>
+                    <Image source={require('../../icons/fast-time.png')} style={{ width: 30, height: 30, borderRadius: 15 }}/>
                     <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenSTP(true)}>
                         <Text style={{alignSelf: 'flex-start'}}>{finalyStartTime.length != 0 ? finalyStartTime : 'Начало'}</Text>
                     </TouchableRipple>
@@ -130,7 +130,7 @@ export const AddNoteScreen = ({ navigation }) => {
                     </TouchableRipple>
                 </View>
                 <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
-                    <Image source={require('../icons/calendar.png')} style = {{ width: 30, height: 30 }} />
+                    <Image source={require('../../icons/calendar.png')} style = {{ width: 30, height: 30 }} />
                     <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenDP(true)}>
                         <Text style={{alignSelf: 'flex-start'}} >{finalyDate.length != 0 ? finalyDate : 'Установите дату'}</Text>
                     </TouchableRipple>

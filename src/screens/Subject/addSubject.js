@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -20,18 +20,23 @@ import {
     Colors
 } from 'react-native/Libraries/NewAppScreen';
 
+import SQLite from 'react-native-sqlite-storage'
+
 import { Overlay } from "@rneui/themed";
 import ColorPicker from 'react-native-wheel-color-picker'
 import { TouchableRipple, Button } from 'react-native-paper';
-import { SubmitButton } from '../uis/submitButton';
-import { ResetButton } from '../uis/resetButton';
+import { SubmitButton } from '../../uis/submitButton';
+import { ResetButton } from '../../uis/resetButton';
+
+SQLite.DEBUG(true);
 
 export const AddSubjectScreen = ({ navigation }) => {
     const grey = '#707070'
-    const [text, onChangeText] = React.useState("");
+    const [text, onChangeText] = useState("");
     const [changedColor, setColor] = useState(grey)
     const [pickedColor, submitColor] = useState(grey)
     const [disabled, setDisabled] = useState(true)
+    const [isSuccess, setSuccess] = useState(false)
 
     const [visible, setVisible] = useState(false);
 
@@ -40,6 +45,29 @@ export const AddSubjectScreen = ({ navigation }) => {
     };
 
     const isDarkMode = useColorScheme() === 'dark';
+
+    var db = SQLite.openDatabase({
+        name: 'schedule_db',
+        location: 'default',
+        createFromLocation:'~www/data.db'
+    })
+
+    const addSubject = () => {
+        db.transaction((tx) => {
+            tx.executeSql(
+                'INSERT OR IGNORE INTO Subjects(Name, Color) VALUES (?, ?)',
+                [text, pickedColor],
+                (tx, result) => {
+                    console.log('Results', result.rowsAffected);
+                    if (result.rowsAffected > 0){
+                        setSuccess(true);
+                    } else {
+                        setSuccess(false);
+                    }
+                }
+            )
+        })
+    }
 
     return (
         <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
@@ -56,7 +84,7 @@ export const AddSubjectScreen = ({ navigation }) => {
             
             <ResetButton onPress={() => {onChangeText(""); submitColor(grey); setDisabled(true)}} />
 
-            <SubmitButton navigation={navigation} disabled={disabled} params = {[{ screen: 'Subjects', color: pickedColor, subject: text }]}/>
+            <SubmitButton navigation={navigation} disabled={disabled} screen = 'Subjects' isSuccess={isSuccess} onPress={() => {addSubject(); db.close();}} params = {{ color: pickedColor, subject: text }}/>
 
             <Overlay overlayStyle = {{ paddingLeft: 0, paddingRight: 0, paddingTop: 0, width: 330, height: 350 }} isVisible={visible} onBackdropPress={toggleOverlay}>
                 <Text style = {{ color: 'black', backgroundColor: 'lime', height: 50, textAlignVertical: 'center', paddingLeft: 25 }}>Выберите цвет</Text>

@@ -22,16 +22,16 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { BottomTabs } from './src/tab/BottomTabs';
-import { SubjectsScreen } from './src/screens/Subject';
-import { TeachersScreen } from './src/screens/Teacher';
-import { ClassroomsScreen } from './src/screens/Classrooms';
-import { NotesScreen } from './src/screens/Notes';
-import { WeekendsScreen } from './src/screens/Weekends';
-import { AddSubjectScreen } from './src/screens/addSubject';
-import { AddTeacherScreen } from './src/screens/addTeacher';
-import { AddClassroomScreen } from './src/screens/addClassroom';
-import { AddNoteScreen } from './src/screens/addNote';
-import { AddWeekendScreen } from './src/screens/addWeekend';
+import { SubjectsScreen } from './src/screens/Subject/Subject';
+import { AddSubjectScreen } from './src/screens/Subject/addSubject';
+import { TeachersScreen } from './src/screens/Teacher/Teacher';
+import { AddTeacherScreen } from './src/screens/Teacher/addTeacher';
+import { ClassroomsScreen } from './src/screens/Classroom/Classrooms';
+import { AddClassroomScreen } from './src/screens/Classroom/addClassroom';
+import { NotesScreen } from './src/screens/Note/Notes';
+import { AddNoteScreen } from './src/screens/Note/addNote';
+import { WeekendsScreen } from './src/screens/Weekend/Weekends';
+import { AddWeekendScreen } from './src/screens/Weekend/addWeekend';
 
 const Stack = createNativeStackNavigator();
 
