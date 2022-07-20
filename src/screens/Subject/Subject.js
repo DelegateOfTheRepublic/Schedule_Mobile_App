@@ -1,18 +1,10 @@
-import { NavigationContainer, useRoute } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useIsFocused, useRoute } from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
+import Toast from 'react-native-toast-message';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
   Text,
-  TouchableOpacity,
   useColorScheme,
   View,
-  Button,
-  Image,
-  Alert,
   FlatList
 } from 'react-native';
 
@@ -24,53 +16,68 @@ import SQLite from 'react-native-sqlite-storage'
 import {AddButton} from '../../uis/addButton'
 import { TouchableRipple } from 'react-native-paper';
 
+import { toastConfig, showToast } from '../../toast'
+import {BottomMenu} from '../../menu'
+import {ScheduleDB as db} from '../../../App'
+import { getSubjects, deleteSubject } from '../../queries'
+
+
 SQLite.DEBUG(true);
 
+/**db.transaction(tx => {
+  tx.executeSql('DELETE FROM Subjects')
+})*/
 
 export const SubjectsScreen = ({ navigation }) => {
-    const [subjects, setSubjects] = useState([])
-    var db = null
+  const [subjects, setSubjects] = useState([])
+  const [currentSubject, setCurrentSubject] = useState(null)
+  const [visible, setVisible] = useState(false)
 
-    useEffect(() => {
-        db = SQLite.openDatabase({
-            name: 'schedule_db',
-            location: 'default',
-            createFromLocation:'~www/data.db'
-        })
+  const isDarkMode = useColorScheme() === 'dark';
+  const isFocused = useIsFocused();
+  const isSuccess = useRoute().params?.isSuccess || false
+  const route = useRoute()
 
-        db.transaction(tx => {
-            tx.executeSql('SELECT * FROM `Subjects`', [], (tx, results) => {
-              const rows = results.rows;
-              let tmp = []
-      
-              for (let i = 0; i < rows.length; i++) {
-                tmp.push({
-                  ...rows.item(i),
-                });
-              }
-    
-              setSubjects(tmp);
-            });
-        });
-    }, [])
+  useEffect(() => {
+    isFocused && getSubjects('SELECT * FROM `Subjects`', setSubjects)
+    isSuccess && isFocused && showToast('success', route.params?.message)
+  }, [isFocused, isSuccess])
 
-    const isDarkMode = useColorScheme() === 'dark';
-    const route = useRoute();
+  const close = () => {
+    setVisible(false)
+  }
 
-    const renderItem = ({ item }) => (
-        <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {}}>
-            <View style = {{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
-                <Text style = {{ alignSelf: 'flex-start' }}>{item.Name}</Text>
-                <View style={{ backgroundColor: item.Color, borderRadius: 13, width: 26, height: 26}}/>
-            </View>
-        </TouchableRipple> 
-      );
-
-    return (
-        <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%' }}>
-            <FlatList data={subjects} renderItem={renderItem} keyExtractor={item => item.IDS} />
-            
-            <AddButton navigation={navigation} screen='AddSubject' onPress={() => db != null ? db.close() : null}/>
-        </View>
+  const renderItem = ({ item }) => (
+      <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisible(true); setCurrentSubject(item)}}>
+          <View style = {{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
+              <Text style = {{ alignSelf: 'center' }}>{item.Name}</Text>
+              <View style={{ backgroundColor: item.Color, borderRadius: 13, width: 26, height: 26}}/>
+          </View>
+      </TouchableRipple> 
     );
+
+  return (
+      <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%' }}>
+        <FlatList data={subjects} renderItem={renderItem} keyExtractor={item => item.IDS} />
+        
+        <AddButton navigation={navigation} screen='AddSubject'/>
+
+        <Toast position='bottom' visibilityTime={2000} config={toastConfig}/>
+
+        <BottomMenu 
+          title={'Выбранный предмет'} 
+          navigation={navigation} 
+          deleteSubject={() => { deleteSubject(currentSubject,
+                                            'DELETE FROM Subjects WHERE IDS = ?',
+                                            [currentSubject.IDS]),
+                                  getSubjects('SELECT * FROM `Subjects`', setSubjects)}} 
+          subject={currentSubject} 
+          visible={visible} 
+          onClose={close} 
+          db={db}
+          screen={'AddSubject'}
+          editScreenTitle={'Редактировать предмет'}
+        />
+      </View>
+  );
 }

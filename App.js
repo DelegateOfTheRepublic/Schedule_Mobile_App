@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import SQLite from 'react-native-sqlite-storage'
 import {
   SafeAreaView,
   ScrollView,
@@ -63,6 +64,12 @@ const list = [
   }
 ]
 
+const db = SQLite.openDatabase({
+  name: 'schedule_db',
+  location: 'Documents',
+  createFromLocation:'~www/data.db'
+})
+
 const App  = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -114,3 +121,4 @@ const styles = StyleSheet.create({
 
 export default App;
 export const Screens = list;
+export const ScheduleDB = db;

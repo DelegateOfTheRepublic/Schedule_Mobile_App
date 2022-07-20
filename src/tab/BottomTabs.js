@@ -4,6 +4,7 @@ import {
     View,
     Image
   } from 'react-native';
+import SQLite from 'react-native-sqlite-storage'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeworkScreen } from '../screens/Homework';
 import { ListsScreen} from '../screens/Lists'
@@ -11,12 +12,18 @@ import { HomeScreen } from '../screens/Home';
 
 export const BottomTabs = (props) => {
     const Tab = createBottomTabNavigator()
+    const db = SQLite.openDatabase({
+        name: 'schedule_db',
+        location: 'Documents',
+        createFromLocation:'~www/data.db'
+    })
 
     return (
         <Tab.Navigator screenOptions={{ tabBarStyle: { height: 60, paddingTop: 12 }, tabBarShowLabel: false, headerShown: false }} initialRouteName = 'Home'>
             <Tab.Screen 
-                name='Lists' 
+                name='Lists'
                 component={ListsScreen}
+                initialParams={{db: db}}
                 options = {{
                     tabBarItemStyle: { flex: 1, flexDirection: 'column', height: 35 },
                     tabBarIcon: ({focused}) => {
