@@ -30,17 +30,25 @@ import ColorPicker from 'react-native-wheel-color-picker'
 import { TouchableRipple, Button } from 'react-native-paper';
 import { SubmitButton } from '../../uis/submitButton';
 import { ResetButton } from '../../uis/resetButton';
+import { BackHeader } from '../../uis/backHeader';
 import { useRoute } from '@react-navigation/native';
 import { toastConfig, showToast } from '../../toast'
 import Toast from 'react-native-toast-message';
-import {ScheduleDB as db} from '../../../App'
+import { addItem, editItem, QuerieStrings } from '../../queries'
+import { focusEffect } from '../../focusEffect'
 
 SQLite.DEBUG(true);
+
+/**
+ * Экран добавления/удаления предмета
+ * 
+ * @param {any} navigation - объект, передаваемый экранам, находящимся в StackNavigator
+ */
 
 export const AddSubjectScreen = ({ navigation }) => {
     const grey = '#707070'
     const route = useRoute()
-    const subject = route.params?.currentSubject || null
+    const subject = route.params?.currentItem || null
     const [text, onChangeText] = useState(subject != null? subject.Name : "");
     const [changedColor, setColor] = useState(grey)
     const [pickedColor, submitColor] = useState(subject != null? subject.Color : grey)
@@ -52,78 +60,18 @@ export const AddSubjectScreen = ({ navigation }) => {
         setVisible(!visible);
     };
 
-    useFocusEffect(
-        useCallback(() => {
-          const onBackPress = () => {
-            navigation.navigate('Subjects', {isSuccess: false});
-            return true;
-          };
-     
-          BackHandler.addEventListener(
-            'hardwareBackPress',
-            onBackPress
-          );
-     
-          return () => {
-            BackHandler.removeEventListener(
-              'hardwareBackPress',
-              onBackPress
-            );
-          };
-        }, []),
-    );
+    focusEffect('Subjects', navigation)
 
     const isDarkMode = useColorScheme() === 'dark';
-
-    const addSubject = (callback) => {
-        if (text.trim() != ''){
-            db.transaction( (tx) => {
-                tx.executeSql(
-                    'INSERT OR IGNORE INTO Subjects(Name, Color) VALUES (?, ?)',
-                    [text, pickedColor],
-                    (tx, result) => {
-                        if (result.rowsAffected > 0){
-                            callback(true)
-                        } else {
-                            callback(false)
-                        }
-                    }
-                )
-            })
-        } else {
-            callback(false)
-        }
-    }
-
-    const editSubject = (callback) => {
-        if (text.trim() != ''){
-            db.transaction((tx) => {
-                tx.executeSql(
-                    'UPDATE Subjects SET Name = ?, Color = ? WHERE IDS = ?',
-                    [text, pickedColor, subject.IDS],
-                    (tx, result) => {
-                        if (result.rowsAffected > 0){
-                            callback(true)
-                        } else {
-                            callback(false)
-                        }
-                    }
-                )
-            })
-        } else {
-            callback(false)
-        }
-    }
 
     return (
         <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
 
-            <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, flexDirection: 'row', alignItems: 'center', padding: 5, borderBottomColor: 'grey', borderBottomWidth: 1 }}>
-                <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => navigation.navigate('Subjects', {isSuccess: false})} style={{ width: 60, height: 60, borderRadius: 30, flexDirection:'row', justifyContent: 'center' }}>
-                    <Image source={require('../../icons/go-back.png')} style={{ width: 25, height: 25, borderRadius: 10, tintColor:'lime', alignSelf: 'center' }} />
-                </TouchableRipple>
-                <Text>{route.params?.title? route.params.title : 'Добавить предмет'}</Text>
-            </View>
+            <BackHeader
+                title = {route.params? route.params?.title : 'Добавить предмет'}
+                navigation = {navigation}
+                backScreen = {'Subjects'}
+            />
 
             <TextInput style={{ color: isDarkMode ? Colors.lighter : Colors.darker }} placeholder="Предмет*" onChangeText={(text) => {onChangeText(text); setDisabled(!(text.length > 0));}} value={text} />
             <Text style={{alignSelf: 'flex-end'}}>{text.length}/256</Text>
@@ -141,7 +89,12 @@ export const AddSubjectScreen = ({ navigation }) => {
             <SubmitButton 
                 navigation={navigation} 
                 disabled={subject != null? false : disabled} 
-                screen = 'Subjects' hz={subject != null? editSubject : addSubject} 
+                screen = 'Subjects' 
+                bridge={(setSuccess) => 
+                    subject != null? 
+                    editItem(text, QuerieStrings.EDIT.SUBJECT, [text, pickedColor, subject.IDS], setSuccess) 
+                    :
+                    addItem(text, QuerieStrings.ADD.SUBJECT, [text, pickedColor], setSuccess)} 
                 showToast={() => 
                     showToast(
                         'info',

@@ -13,20 +13,24 @@ import {
   Button
 } from 'react-native';
 
+import {
+    Colors
+} from 'react-native/Libraries/NewAppScreen';
+
 import {Screens} from '../../App';
 
 export const ListsScreen = ({ navigation }) => {
-    const db = useRoute().params.db
+    const isDarkMode = useColorScheme() === 'dark';
 
     return (
-        <View>
+        <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
             {Screens.map((item) => {
                 return (
                     <Button 
                         title={item.rusName} 
                         key={item.name} 
                         name = {item.name} 
-                        onPress = {() => navigation.navigate(item.name, {db})}
+                        onPress = {() => navigation.navigate(item.name)}
                     />
                 );
         })}

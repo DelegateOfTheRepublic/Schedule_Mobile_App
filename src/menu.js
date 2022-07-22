@@ -10,7 +10,6 @@ import {
 
 export const BottomMenu = (props) => {
     const currentItem = props?.subject
-    const db = props?.db
     const navigation = props?.navigation
     const refRBSheet = useRef();
     const screenTitle = props?.title
@@ -43,13 +42,17 @@ export const BottomMenu = (props) => {
             <Image source={require('./icons/right-arrow.png')} style={{ width: 25, height: 25 ,tintColor: 'blue' }} />
           </View>
           <View style = {{ width: '50%', flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 5 }}>
-              <Text style = {{ alignSelf: 'center' }}>{currentItem?.Name}</Text>
-              <View style={{ backgroundColor: currentItem?.Color, borderRadius: 13, width: 26, height: 26}}/>
+              <Text style = {{ alignSelf: 'center' }}>{currentItem?.Name || currentItem?.FirstName || currentItem?.classroom || currentItem?.Note}</Text>
+              {currentItem?.Color? 
+                <View style={{ backgroundColor: currentItem?.Color, borderRadius: 13, width: 26, height: 26}}/>
+                :
+                null
+              }
           </View>
         </View>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 20 }}>
-          <TouchableRipple style = {{ alignSelf: 'flex-start', padding: 10 }} borderless={true} rippleColor={'purple'} onPress={() => { refRBSheet.current.close(); navigation.navigate(screen, {title, currentSubject: currentItem}) }}>
+          <TouchableRipple style = {{ alignSelf: 'flex-start', padding: 10 }} borderless={true} rippleColor={'purple'} onPress={() => { refRBSheet.current.close(); navigation.navigate(screen, {title, currentItem: currentItem}) }}>
             <Text style = {{ color: 'black' }}>Изменить</Text>
           </TouchableRipple> 
 

@@ -43,7 +43,7 @@ const list = [
     screen: SubjectsScreen
   },
   {
-    name: 'Teacher',
+    name: 'Teachers',
     rusName: 'Преподователи',
     screen: TeachersScreen
   },
@@ -63,6 +63,11 @@ const list = [
     screen: WeekendsScreen
   }
 ]
+
+/**SQLite.deleteDatabase({
+  name: 'schedule_db',
+  location: '~www/data.db'
+})*/
 
 const db = SQLite.openDatabase({
   name: 'schedule_db',

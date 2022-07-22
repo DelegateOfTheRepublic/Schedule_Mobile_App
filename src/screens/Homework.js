@@ -12,10 +12,15 @@ import {
   Image
 } from 'react-native';
 
+import {
+    Colors
+} from 'react-native/Libraries/NewAppScreen';
+
 export const HomeworkScreen = props => {
+    const isDarkMode = useColorScheme() === 'dark';
 
     return (
-        <View>
+        <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
             <Text>
                 This is HomeworkScreen!
             </Text>

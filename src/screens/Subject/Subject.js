@@ -19,14 +19,15 @@ import { TouchableRipple } from 'react-native-paper';
 import { toastConfig, showToast } from '../../toast'
 import {BottomMenu} from '../../menu'
 import {ScheduleDB as db} from '../../../App'
-import { getSubjects, deleteSubject } from '../../queries'
-
+import { getItems, deleteItem, QuerieStrings } from '../../queries'
 
 SQLite.DEBUG(true);
 
-/**db.transaction(tx => {
-  tx.executeSql('DELETE FROM Subjects')
-})*/
+/**
+ * Экран, отображающий предметы
+ * 
+ * @param {any} navigation - объект, передаваемый экранам, находящимся в StackNavigator
+ */
 
 export const SubjectsScreen = ({ navigation }) => {
   const [subjects, setSubjects] = useState([])
@@ -39,7 +40,7 @@ export const SubjectsScreen = ({ navigation }) => {
   const route = useRoute()
 
   useEffect(() => {
-    isFocused && getSubjects('SELECT * FROM `Subjects`', setSubjects)
+    isFocused && getItems(QuerieStrings.GET_ALL.SUBJECTS, setSubjects)
     isSuccess && isFocused && showToast('success', route.params?.message)
   }, [isFocused, isSuccess])
 
@@ -67,10 +68,10 @@ export const SubjectsScreen = ({ navigation }) => {
         <BottomMenu 
           title={'Выбранный предмет'} 
           navigation={navigation} 
-          deleteSubject={() => { deleteSubject(currentSubject,
-                                            'DELETE FROM Subjects WHERE IDS = ?',
+          deleteSubject={() => { deleteItem(currentSubject,
+                                            QuerieStrings.DELETE.SUBJECT,
                                             [currentSubject.IDS]),
-                                  getSubjects('SELECT * FROM `Subjects`', setSubjects)}} 
+                                  getItems(QuerieStrings.GET_ALL.SUBJECTS, setSubjects)}} 
           subject={currentSubject} 
           visible={visible} 
           onClose={close} 
