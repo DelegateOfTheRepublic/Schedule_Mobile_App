@@ -1,5 +1,5 @@
 import { useIsFocused, useRoute } from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Toast from 'react-native-toast-message';
 import {
   Text,
@@ -48,18 +48,23 @@ export const SubjectsScreen = ({ navigation }) => {
     setVisible(false)
   }
 
-  const renderItem = ({ item }) => (
+  const renderItem = useCallback(({ item }) => {
+    return (
       <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisible(true); setCurrentSubject(item)}}>
-          <View style = {{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
-              <Text style = {{ alignSelf: 'center' }}>{item.Name}</Text>
-              <View style={{ backgroundColor: item.Color, borderRadius: 13, width: 26, height: 26}}/>
-          </View>
+        <View style = {{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
+            <Text style = {{ alignSelf: 'center' }}>{item.Name}</Text>
+            <View style={{ backgroundColor: item.Color, borderRadius: 13, width: 26, height: 26}}/>
+        </View>
       </TouchableRipple> 
-    );
+    )
+  }, [])
+
+  const itemKeyExtractor = useCallback (item => item.IDS, [])
+
 
   return (
       <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%' }}>
-        <FlatList data={subjects} renderItem={renderItem} keyExtractor={item => item.IDS} />
+        <FlatList data={subjects} renderItem={renderItem} keyExtractor={itemKeyExtractor} />
         
         <AddButton navigation={navigation} screen='AddSubject'/>
 
@@ -68,6 +73,7 @@ export const SubjectsScreen = ({ navigation }) => {
         <BottomMenu 
           title={'Выбранный предмет'} 
           navigation={navigation} 
+          isOptionsSheet
           deleteSubject={() => { deleteItem(currentSubject,
                                             QuerieStrings.DELETE.SUBJECT,
                                             [currentSubject.IDS]),

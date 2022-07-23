@@ -51,7 +51,7 @@ export const AddNoteScreen = ({ navigation }) => {
   
   useEffect(() => {
     getItems(QuerieStrings.GET_ALL.SUBJECTS, setData)
-    {note != null && getItem(QuerieStrings.GET.SUBJECT, [note.Subject], setSubject)}
+    {(note != null) && getItem(QuerieStrings.GET.SUBJECT, [note.Subject], setSubject).then((data) => {setSubject(data)})}
   }, [])
 
   const [isFocus, setIsFocus] = useState(false);
@@ -142,7 +142,7 @@ export const AddNoteScreen = ({ navigation }) => {
                       setIsFocus(false);
                   }}
               />
-              <Text style={{alignSelf: 'flex-end'}} >{subject != null ? subject.length : 0}/256</Text>
+              <Text style={{alignSelf: 'flex-end'}} >{subject != null ? subject.Name.length : 0}/256</Text>
           </View>
           <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Image source={require('../../icons/fast-time.png')} style={{ width: 30, height: 30, borderRadius: 15 }}/>

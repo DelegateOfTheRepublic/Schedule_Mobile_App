@@ -1,5 +1,6 @@
 import { showToast } from './toast'
 import {ScheduleDB as db} from '../App'
+import SQLite from 'react-native-sqlite-storage'
 
 /**
  * #getItems - извлекает все записи из бд
@@ -35,12 +36,15 @@ export const QuerieStrings = {
   GET: {
     SUBJECT: 'SELECT * FROM Subjects WHERE NAME = ?'
   },
+  GET_COUNT: {
+    SUBJECTS_IN_NOTE: 'SELECT Subject, count(Subject) as count from Notes GROUP BY Subject'
+  },
   ADD: {
     SUBJECT: 'INSERT OR IGNORE INTO Subjects(Name, Color) VALUES(?, ?)',
     NOTE: 'INSERT OR IGNORE INTO Notes(Note, Subject, StartTime, EndTime, Date) VALUES(?, ?, ?, ?, ?)',
     TEACHER: 'INSERT OR IGNORE INTO Teachers(FirstName, Phone, Email, Info) VALUES(?, ?, ?, ?)',
     CLASSROOM: 'INSERT OR IGNORE INTO Classrooms(classroom) VALUES(?)',
-    WEEKEND: 'INSERT OR IGNORE INTO Weekend(Name, StartDate, EndDate) VALUES(?, ?, ?)'
+    WEEKEND: 'INSERT OR IGNORE INTO Weekends(Name, StartDate, EndDate) VALUES(?, ?, ?)'
   },
   DELETE: {
     SUBJECT: 'DELETE FROM Subjects WHERE IDS = ?',
@@ -54,32 +58,68 @@ export const QuerieStrings = {
     NOTE: 'UPDATE Notes SET Note = ?, Subject = ?, StartTime = ?, EndTime = ?, Date = ? WHERE IDN = ?',
     TEACHER: 'UPDATE Teachers SET FirstName = ?, Phone = ?, Email = ?, Info = ? WHERE IDT = ?',
     CLASSROOM: 'UPDATE Classrooms SET classroom = ? WHERE IDCr = ?',
-    WEEKEND: 'UPDATE Weekend SET Name = ?, StartDate = ?, EndDate = ? WHERE IDW = ?'
+    WEEKEND: 'UPDATE Weekends SET Name = ?, StartDate = ?, EndDate = ? WHERE IDW = ?'
   }
 }
 
+SQLite.enablePromise(true)
+
 export const getItems = (query, setItems) => {
+  db.transaction(tx => {
+    tx.executeSql(query, [], (tx, results) => {
+      const rows = results.rows;
+      let tmp = []
+
+      for (let i = 0; i < rows.length; i++) {
+        tmp.push({
+          ...rows.item(i),
+        });
+      }
+      setItems(tmp);
+    });
+  });
+}
+
+export const getItemsCount = (query, setItemsCount) => {
+  return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(query, [], (tx, results) => {
         const rows = results.rows;
         let tmp = []
-
+  
         for (let i = 0; i < rows.length; i++) {
-          tmp.push({
+          rowItem = {
             ...rows.item(i),
-          });
+          }
+          tmp.push(rowItem);
         }
-
-        setItems(tmp);
+  
+        for (let i = 0; i < tmp.length; i++){
+          let notes = []
+          db.transaction(tx => {
+            tx.executeSql('SELECT * FROM Notes WHERE Subject = ?', [tmp[i].Subject], (tx, result) => {
+              const rows = result.rows;
+  
+              for (let i = 0; i < rows.length; i++){
+                notes.push({...rows.item(i)})
+              }
+            })
+          }).then(() => { tmp[i]['Notes'] = notes; resolve(tmp) })
+        }
+        setItemsCount(tmp);
       });
     });
+  })
 }
 
 export const getItem = (query, value, setItem) => {
-  db.transaction(tx => {
-    tx.executeSql(query, value, (tx, result) => {
-      setItem({...result.rows.item(0)})
-    })
+  return new Promise((resolve, reject) => {
+    let item = null
+    db.transaction(tx => {
+      tx.executeSql(query, value, (tx, result) => {
+        item = {...result.rows.item(0)}
+      })
+    }).then(() => resolve(item))
   })
 }
 
@@ -105,21 +145,21 @@ export const addItem = (itemName, query, values, setSuccess) => {
 }
 
 export const deleteItem = (currentItem, query, values) => {
-    if (currentItem != null) {
-      db.transaction(tx => {
-        tx.executeSql(
-          query, 
-          values, 
-          (tx, result) => {
-            if (result.rowsAffected > 0){
-              showToast('success', 'Удалено')
-            } else {
-              showToast('warning', 'Не удалено')
-            }
+  if (currentItem != null) {
+    db.transaction(tx => {
+      tx.executeSql(
+        query, 
+        values, 
+        (tx, result) => {
+          if (result.rowsAffected > 0){
+            showToast('success', 'Удалено')
+          } else {
+            showToast('warning', 'Не удалено')
           }
-        )
-      })
-    }
+        }
+      )
+    })
+  }
 }
 
 export const editItem = (itemName, query, values, setSuccess) => {

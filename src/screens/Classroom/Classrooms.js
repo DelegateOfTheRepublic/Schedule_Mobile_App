@@ -1,5 +1,5 @@
 import { useIsFocused, useRoute } from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import Toast from 'react-native-toast-message';
 import {
   Text,
@@ -49,18 +49,21 @@ export const ClassroomsScreen = ({ navigation }) => {
         setVisible(false)
     }
 
-    const renderItem = ({ item }) => (
-      <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisible(true); setCurrentClassroom(item)}}>
-          <View style = {{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
-              <Text style = {{ alignSelf: 'center' }}>{item.classroom}</Text>
-              <View style={{ backgroundColor: item.Color, borderRadius: 13, width: 26, height: 26}}/>
-          </View>
-      </TouchableRipple> 
-    );
+    const renderItem = useCallback(({ item }) => {
+        return (
+            <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisible(true); setCurrentClassroom(item)}}>
+                <View style = {{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
+                    <Text style = {{ alignSelf: 'center' }}>{item.classroom}</Text>
+                </View>
+            </TouchableRipple> 
+        )
+    }, [])
+
+    const itemKeyExtractor = useCallback (item => item.IDCr, [])
 
     return (
         <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
-            <FlatList data={classrooms} renderItem={renderItem} keyExtractor={item => item.IDCr} />
+            <FlatList data={classrooms} renderItem={renderItem} keyExtractor={itemKeyExtractor} />
 
             <AddButton navigation={navigation} screen='AddClassroom'/>
 
@@ -69,6 +72,7 @@ export const ClassroomsScreen = ({ navigation }) => {
             <BottomMenu 
                 title={'Выбранная аудитория'} 
                 navigation={navigation} 
+                isOptionsSheet
                 deleteSubject={() => { deleteItem(currentClassroom,
                                                     QuerieStrings.DELETE.CLASSROOM,
                                                     [currentClassroom.IDCr]),
