@@ -49,7 +49,7 @@ export const BottomTabs = (props) => {
                             <View style={{ width: '100%', alignItems: 'center'}}>
                                 <Image source={require('../icons/home.png')} style={{ tintColor: focused ? 'purple' : 'black', width: 25, height: 25 }}/>
                                 {focused ? 
-                                    <Text style={{ fontSize:10.5, color:'purple'}}>Главная</Text>:
+                                    <Text style={{ fontSize:10.5, color:'purple'}}>Расписание</Text>:
                                     null
                                 }
                             </View>

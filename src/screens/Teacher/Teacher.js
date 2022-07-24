@@ -25,6 +25,7 @@ import { toastConfig, showToast } from '../../toast'
 import {BottomMenu} from '../../menu'
 import {ScheduleDB as db} from '../../../App'
 import { getItems, deleteItem, QuerieStrings } from '../../queries'
+import { VerticalLine } from '../../uis/verticalLine'
 
 SQLite.DEBUG(true);
 
@@ -55,12 +56,16 @@ export const TeachersScreen = ({ navigation }) => {
 
   const renderItem = useCallback(({ item }) => {
     return (
-      <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisible(true); setCurrentTeacher(item)}}>
-        <View style = {{ flexDirection: 'column', justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
-            <Text style = {{ alignSelf: 'center' }}>{item.FirstName}</Text>
-            {item.Phone && <Text style = {{ alignSelf: 'center' }}>{item.Phone}</Text>}
-            {item.Email && <Text style = {{ alignSelf: 'center' }}>{item.Email}</Text>}
-            {item.Info && <Text style = {{ alignSelf: 'center' }}>{item.Info}</Text>}
+      <TouchableRipple style={{ borderRadius: 5 }} borderless={true} rippleColor={'#FFF903'} onPress={() => {setVisible(true); setCurrentTeacher(item)}}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <VerticalLine/>
+          <View style = {styles.teacher}>
+              <Text style = {{ alignSelf: 'center' }}>{item.FirstName}</Text>
+              {item.Phone && <Text style = {{ alignSelf: 'center' }}>{item.Phone}</Text>}
+              {item.Email && <Text style = {{ alignSelf: 'center' }}>{item.Email}</Text>}
+              {item.Info && <Text style = {{ alignSelf: 'center' }}>{item.Info}</Text>}
+          </View>
+          <VerticalLine/>
         </View>
     </TouchableRipple> 
     )
@@ -69,7 +74,7 @@ export const TeachersScreen = ({ navigation }) => {
   const itemKeyExtractor = useCallback (item => item.IDT, [])
 
   return (
-      <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%' }}>
+      <View style={[styles.mainContainer, {backgroundColor: isDarkMode ? Colors.darker : Colors.lighter}]}>
         <FlatList data={teachers} renderItem={renderItem} keyExtractor={itemKeyExtractor} />
         
         <AddButton navigation={navigation} screen='AddTeacher'/>
@@ -94,3 +99,19 @@ export const TeachersScreen = ({ navigation }) => {
       </View>
   );
 }
+
+const styles = StyleSheet.create({
+  mainContainer: {
+      height: '100%', 
+      padding: 10
+  },
+  teacher: {
+    flexDirection: 'column',
+    justifyContent: 'space-between', 
+    backgroundColor: '#8471D8', 
+    borderRadius: 15, 
+    paddingLeft: 8, 
+    paddingRight: 8, 
+    padding: 2
+  }
+})

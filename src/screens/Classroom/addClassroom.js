@@ -36,6 +36,7 @@ import { toastConfig, showToast } from '../../toast'
 import Toast from 'react-native-toast-message';
 import { addItem, editItem, QuerieStrings } from '../../queries'
 import { focusEffect } from '../../focusEffect'
+import { WarningOverlay } from '../../uis/warningOverlay';
 
 /**
  * Экран добавления/удаления предмета
@@ -51,6 +52,11 @@ export const AddClassroomScreen = ({ navigation }) => {
     const [classroomName, setClassroom] = useState(classroom != null? classroom.classroom : "");
 
     const [visible, setVisible] = useState(false);
+    const [visibleWarning, setVisibleWarning] = useState(false)
+
+    const toggleModalWarning = () => {
+        setVisibleWarning(!visibleWarning)
+    }
 
     focusEffect('Classrooms', navigation)
 
@@ -61,6 +67,17 @@ export const AddClassroomScreen = ({ navigation }) => {
                 title = {route.params? route.params?.title : 'Добавить аудиторию'}
                 navigation = {navigation}
                 backScreen = {'Classrooms'}
+                dataCheck={() => {
+                    return classroomName != ""
+                }}
+                setVisibleWarning = {(visibleWarning) => setVisibleWarning(visibleWarning)}
+            />
+
+            <WarningOverlay
+                visibleWarning={visibleWarning}
+                toggleModalWarning={toggleModalWarning}
+                baseScreen={'Classrooms'}
+                navigation={navigation}
             />
 
             <View>

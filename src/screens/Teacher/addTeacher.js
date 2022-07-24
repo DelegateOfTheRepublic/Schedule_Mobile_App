@@ -36,6 +36,7 @@ import { toastConfig, showToast } from '../../toast'
 import Toast from 'react-native-toast-message';
 import { addItem, editItem, QuerieStrings } from '../../queries'
 import { focusEffect } from '../../focusEffect'
+import { WarningOverlay } from '../../uis/warningOverlay';
 
 SQLite.DEBUG(true);
 
@@ -54,7 +55,11 @@ export const AddTeacherScreen = ({ navigation }) => {
     const [email, setEmail] = useState(teacher != null? teacher.Email : "")
     const [additionalInfo, setAdditionalInfo] = useState(teacher != null? teacher.Info : "")
 
-    const [visible, setVisible] = useState(false);
+    const [visibleWarning, setVisibleWarning] = useState(false)
+
+    const toggleModalWarning = () => {
+        setVisibleWarning(!visibleWarning)
+    }
 
     const isDarkMode = useColorScheme() === 'dark';
 
@@ -67,6 +72,17 @@ export const AddTeacherScreen = ({ navigation }) => {
                 title = {route.params? route.params?.title : 'Добавить преподавателя'}
                 navigation = {navigation}
                 backScreen = {'Teachers'}
+                dataCheck={() => {
+                    return teacherName != ""
+                }}
+                setVisibleWarning = {(visibleWarning) => setVisibleWarning(visibleWarning)}
+            />
+
+            <WarningOverlay
+                visibleWarning={visibleWarning}
+                toggleModalWarning={toggleModalWarning}
+                baseScreen={'Teachers'}
+                navigation={navigation}
             />
 
             <ScrollView>

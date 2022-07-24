@@ -26,6 +26,7 @@ import {
 
 import SQLite from 'react-native-sqlite-storage'
 
+import { Overlay } from "@rneui/themed";
 import { SubmitButton } from '../../uis/submitButton';
 import { ResetButton } from '../../uis/resetButton';
 import { BackHeader } from '../../uis/backHeader'
@@ -34,6 +35,7 @@ import { toastConfig, showToast } from '../../toast'
 import Toast from 'react-native-toast-message';
 import { getItems, getItem, addItem, editItem, QuerieStrings } from '../../queries'
 import { focusEffect } from '../../focusEffect'
+import { WarningOverlay } from '../../uis/warningOverlay';
 
 SQLite.DEBUG(true);
 
@@ -61,6 +63,7 @@ export const AddNoteScreen = ({ navigation }) => {
 
   const [textNote, setTextNote] = useState(note != null ? note.Note : '')
   const [disabled, setDasabled] = useState(true)
+  const [visibleWarning, setVisibleWarning] = useState(false)
 
   const [openStartTimePicker, setOpenSTP] = useState(false)
   const [openEndTimePicker, setOpenETP] = useState(false)
@@ -74,6 +77,10 @@ export const AddNoteScreen = ({ navigation }) => {
   const [finalyDate, setFinDate] = useState(note != null ? note.Date : '')
 
   focusEffect('Notes', navigation)
+
+  const toggleModalWarning = () => {
+    setVisibleWarning(!visibleWarning)
+  }
 
   const onChangeFullTimeInterval = (selectedDate) => {
     const currentDate = selectedDate;
@@ -110,6 +117,17 @@ export const AddNoteScreen = ({ navigation }) => {
         title = {route.params? route.params?.title : 'Добавить заметку'}
         navigation = {navigation}
         backScreen = {'Notes'}
+        dataCheck={() => {
+          return textNote != "" || subject || finalyStartTime != "" || finalyEndTime != "" || pickedDate != ""
+        }}
+        setVisibleWarning = {(visibleWarning) => setVisibleWarning(visibleWarning)}
+      />
+
+      <WarningOverlay
+          visibleWarning={visibleWarning}
+          toggleModalWarning={toggleModalWarning}
+          baseScreen={'Notes'}
+          navigation={navigation}
       />
 
       <ScrollView>
@@ -145,7 +163,7 @@ export const AddNoteScreen = ({ navigation }) => {
               <Text style={{alignSelf: 'flex-end'}} >{subject != null ? subject.Name.length : 0}/256</Text>
           </View>
           <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Image source={require('../../icons/fast-time.png')} style={{ width: 30, height: 30, borderRadius: 15 }}/>
+              <Image source={require('../../icons/fast-time.png')} style={{ width: 30, height: 30, borderRadius: 15, tintColor: '#FFF903' }}/>
               <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenSTP(true)}>
                   <Text style={{alignSelf: 'flex-start'}}>{finalyStartTime.length != 0 ? finalyStartTime : 'Начало'}</Text>
               </TouchableRipple>
@@ -154,7 +172,7 @@ export const AddNoteScreen = ({ navigation }) => {
               </TouchableRipple>
           </View>
           <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }} >
-              <Image source={require('../../icons/calendar.png')} style = {{ width: 30, height: 30 }} />
+              <Image source={require('../../icons/calendar.png')} style = {{ width: 30, height: 30, tintColor: '#FFF903' }} />
               <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenDP(true)}>
                   <Text style={{alignSelf: 'flex-start'}} >{finalyDate.length != 0 ? finalyDate : 'Установите дату'}</Text>
               </TouchableRipple>
@@ -180,9 +198,9 @@ export const AddNoteScreen = ({ navigation }) => {
           screen = 'Notes' 
           bridge={(setSuccess) => 
             note != null? 
-            editItem(textNote, QuerieStrings.EDIT.NOTE, [textNote, subject.Name, finalyStartTime, finalyEndTime, finalyDate, note.IDN], setSuccess) 
+            editItem(textNote, QuerieStrings.EDIT.NOTE, [textNote, subject?.Name, finalyStartTime, finalyEndTime, finalyDate, note.IDN], setSuccess) 
             : 
-            addItem(textNote, QuerieStrings.ADD.NOTE, [textNote, subject.Name, finalyStartTime, finalyEndTime, finalyDate], setSuccess)} 
+            addItem(textNote, QuerieStrings.ADD.NOTE, [textNote, subject?.Name, finalyStartTime, finalyEndTime, finalyDate], setSuccess)} 
           showToast={() => 
               showToast(
                   'info',

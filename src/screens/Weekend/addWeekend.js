@@ -37,6 +37,7 @@ import { toastConfig, showToast } from '../../toast'
 import Toast from 'react-native-toast-message';
 import { addItem, editItem, QuerieStrings } from '../../queries'
 import { focusEffect } from '../../focusEffect'
+import { WarningOverlay } from '../../uis/warningOverlay';
 
 export const AddWeekendScreen = ({ navigation }) => {
     const isDarkMode = useColorScheme() === 'dark';
@@ -64,6 +65,11 @@ export const AddWeekendScreen = ({ navigation }) => {
     const [pickedEndDate, setEndDate] = useState(weekendIsNotNull? weekend.EndDate : '')
     const [finalyStartDate, setFinStartDate] = useState(weekendIsNotNull? getReadableDate(weekend.StartDate) : '')
     const [finalyEndDate, setFinEndDate] = useState(weekendIsNotNull? getReadableDate(weekend.EndDate) : '')
+    const [visibleWarning, setVisibleWarning] = useState(false)
+
+    const toggleModalWarning = () => {
+        setVisibleWarning(!visibleWarning)
+    }
 
     focusEffect('Weekends', navigation)
 
@@ -73,6 +79,17 @@ export const AddWeekendScreen = ({ navigation }) => {
                 title = {route.params? route.params?.title : 'Добавить выходной'}
                 navigation = {navigation}
                 backScreen = {'Weekends'}
+                dataCheck={() => {
+                    return weekendName != "" || finalyStartDate != '' || finalyEndDate != ''
+                }}
+                setVisibleWarning = {(visibleWarning) => setVisibleWarning(visibleWarning)}
+            />
+
+            <WarningOverlay
+                visibleWarning={visibleWarning}
+                toggleModalWarning={toggleModalWarning}
+                baseScreen={'Weekends'}
+                navigation={navigation}
             />
 
             <View>
@@ -81,14 +98,14 @@ export const AddWeekendScreen = ({ navigation }) => {
             </View>
             
             <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Image source={require('../../icons/calendar.png')} style={{ width: 30, height: 30 }} />
+                <Image source={require('../../icons/calendar.png')} style={{ width: 30, height: 30, tintColor: '#FFF903' }} />
                 <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenSDP(true)}>
                     <Text style={{alignSelf: 'flex-start'}} >{finalyStartDate.length != 0 ? finalyStartDate : 'Установите дату начала'}</Text>
                 </TouchableRipple>
             </View>
 
             <View style = {{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Image source={require('../../icons/calendar.png')} style={{ width: 30, height: 30 }} />
+                <Image source={require('../../icons/calendar.png')} style={{ width: 30, height: 30, tintColor: '#FFF903' }} />
                 <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => setOpenEDP(true)}>
                     <Text style={{alignSelf: 'flex-start'}} >{finalyEndDate.length != 0 ? finalyEndDate : 'Установите дату конца'}</Text>
                 </TouchableRipple>

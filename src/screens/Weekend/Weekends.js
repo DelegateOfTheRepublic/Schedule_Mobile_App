@@ -6,7 +6,7 @@ import {
   useColorScheme,
   View,
   FlatList,
-  ScrollView
+  StyleSheet
 } from 'react-native';
 
 import {
@@ -20,6 +20,7 @@ import { toastConfig, showToast } from '../../toast'
 import {BottomMenu} from '../../menu'
 import {ScheduleDB as db} from '../../../App'
 import { getItems, deleteItem, QuerieStrings } from '../../queries'
+import { VerticalLine } from '../../uis/verticalLine';
 
 /**
  * Экран, отображающий выходные
@@ -59,13 +60,17 @@ export const WeekendsScreen = ({ navigation }) => {
 
     const renderItem = useCallback(({ item }) => {
         return (
-            <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisible(true); setCurrentWeekend(item)}}>
-                <View style = {{ justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
-                    <Text style = {{ alignSelf: 'center' }}>{item.Name}</Text>
-                    <View style = {{ flexDirection: 'row' }}>
-                        <Text>С{getReadableDate(item.StartDate)} </Text>
-                        <Text>по{getReadableDate(item.EndDate)}</Text>
+            <TouchableRipple style={{marginBottom: 20, borderRadius: 5}} borderless={true} rippleColor={'#FFF903'} onPress={() => {setVisible(true); setCurrentWeekend(item)}}>
+                <View style = {{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <VerticalLine/>
+                    <View style = {styles.subjectBackground}>
+                        <Text style = {{ alignSelf: 'center' }}>{item.Name}</Text>
+                        <View style = {{ flexDirection: 'row', alignSelf: 'center' }}>
+                            <Text>С{getReadableDate(item.StartDate)} </Text>
+                            <Text>по{getReadableDate(item.EndDate)}</Text>
+                        </View>
                     </View>
+                    <VerticalLine/>
                 </View>
             </TouchableRipple> 
         )
@@ -74,7 +79,7 @@ export const WeekendsScreen = ({ navigation }) => {
     const itemKeyExtractor = useCallback (item => item.IDW, [])
 
     return (
-        <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
+        <View style={[styles.mainContainer, {backgroundColor: isDarkMode ? Colors.darker : Colors.lighter}]}>
             <FlatList data={weekends} renderItem={renderItem} keyExtractor={itemKeyExtractor} />
 
             <AddButton navigation={navigation} screen='AddWeekend'/>
@@ -99,3 +104,22 @@ export const WeekendsScreen = ({ navigation }) => {
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        height: '100%', 
+        padding: 10
+    },
+    subjectBackground: {
+        backgroundColor: '#8471D8', 
+        borderRadius: 10, 
+        padding: 5
+    },
+    subject: {
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
+        backgroundColor: '#95276E', 
+        borderRadius: 10, 
+        padding: 5
+    }
+})

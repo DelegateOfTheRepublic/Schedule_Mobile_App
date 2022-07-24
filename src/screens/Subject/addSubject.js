@@ -25,6 +25,7 @@ import {
 
 import SQLite from 'react-native-sqlite-storage'
 
+import { ModalPortal,  Modal,  ModalFooter, ModalButton, ModalContent } from 'react-native-modals';
 import { Overlay } from "@rneui/themed";
 import ColorPicker from 'react-native-wheel-color-picker'
 import { TouchableRipple, Button } from 'react-native-paper';
@@ -36,6 +37,7 @@ import { toastConfig, showToast } from '../../toast'
 import Toast from 'react-native-toast-message';
 import { addItem, editItem, QuerieStrings } from '../../queries'
 import { focusEffect } from '../../focusEffect'
+import { WarningOverlay } from '../../uis/warningOverlay';
 
 SQLite.DEBUG(true);
 
@@ -55,10 +57,15 @@ export const AddSubjectScreen = ({ navigation }) => {
     const [disabled, setDisabled] = useState(true)
 
     const [visible, setVisible] = useState(false);
+    const [visibleWarning, setVisibleWarning] = useState(false)
 
     const toggleOverlay = () => {
         setVisible(!visible);
     };
+
+    const toggleModalWarning = () => {
+        setVisibleWarning(!visibleWarning)
+    }
 
     focusEffect('Subjects', navigation)
 
@@ -71,6 +78,17 @@ export const AddSubjectScreen = ({ navigation }) => {
                 title = {route.params? route.params?.title : 'Добавить предмет'}
                 navigation = {navigation}
                 backScreen = {'Subjects'}
+                dataCheck={() => {
+                    return text != ""
+                }}
+                setVisibleWarning = {(visibleWarning) => setVisibleWarning(visibleWarning)}
+            />
+
+            <WarningOverlay
+                visibleWarning={visibleWarning}
+                toggleModalWarning={toggleModalWarning}
+                baseScreen={'Subjects'}
+                navigation={navigation}
             />
 
             <TextInput style={{ color: isDarkMode ? Colors.lighter : Colors.darker }} placeholder="Предмет*" onChangeText={(text) => {onChangeText(text); setDisabled(!(text.length > 0));}} value={text} />
@@ -79,9 +97,9 @@ export const AddSubjectScreen = ({ navigation }) => {
                 <View
                     style={{ backgroundColor: pickedColor, alignSelf: 'center', borderRadius: 13, width: 26, height: 26}}
                 />
-                <View style={{ width: '80%', alignSelf: 'flex-start' }}>
-                    <RNButton title='Цвет' onPress={toggleOverlay} />
-                </View>
+                <TouchableRipple style={styles.colorPicker} borderless={true} rippleColor={'#FFF903'} onPress={toggleOverlay}>
+                    <Text style={{alignSelf: 'center'}}>Цвет</Text>
+                </TouchableRipple> 
             </View>
             
             <ResetButton onPress={() => {onChangeText(""); submitColor(grey); setDisabled(true);}} />
@@ -136,3 +154,13 @@ export const AddSubjectScreen = ({ navigation }) => {
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    colorPicker: {
+        backgroundColor: '#8471D8', 
+        borderRadius: 10, 
+        padding: 5, 
+        width: '80%', 
+        alignSelf: 'flex-start'
+    }
+})

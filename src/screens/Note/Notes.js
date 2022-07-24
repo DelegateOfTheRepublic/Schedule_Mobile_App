@@ -6,7 +6,7 @@ import {
   useColorScheme,
   View,
   FlatList,
-  ScrollView
+  StyleSheet
 } from 'react-native';
 
 import {
@@ -20,6 +20,7 @@ import { TouchableRipple } from 'react-native-paper';
 
 import { toastConfig, showToast } from '../../toast'
 import {BottomMenu} from '../../menu'
+import { VerticalLine } from '../../uis/verticalLine'
 import {ScheduleDB as db} from '../../../App'
 import { getItems, deleteItem, QuerieStrings, getItemsCount } from '../../queries'
 
@@ -47,14 +48,18 @@ export const NotesScreen = ({ navigation }) => {
     
     const renderItem = useCallback(({ item }) => {
         return (
-            <TouchableRipple borderless={true} rippleColor={'purple'} onPress={() => {setVisibleNS(true); setCurSCN(item)}}>
-                <View style = {{ justifyContent: 'space-between', backgroundColor: 'green', padding: 10 }}>
-                    <Text style = {{ alignSelf: 'center' }}>
-                        {item.Subject}
-                    </Text>
-                    <Text style = {{ alignSelf: 'center' }}>
-                        {item.count}
-                    </Text>
+            <TouchableRipple style={{ borderRadius: 5, marginBottom: 10 }} borderless={true} rippleColor={'#FFF903'} onPress={() => {setVisibleNS(true); setCurSCN(item)}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <VerticalLine/>
+                    <View style = {styles.subject}>
+                        <Text style = {{ alignSelf: 'center' }}>
+                            {item.Subject}
+                        </Text>
+                        <Text style = {{ alignSelf: 'center' }}>
+                            {item.count}
+                        </Text>
+                    </View>
+                    <VerticalLine/>
                 </View>
             </TouchableRipple> 
         )
@@ -64,13 +69,17 @@ export const NotesScreen = ({ navigation }) => {
 
     const renderNote = useCallback(({ item, index }) => {
         return (
-            <TouchableRipple key={`${item.Subject}${index}`} borderless={true} rippleColor={'purple'} onPress={() => {setVisibleOS(true); setCurrentNote(item)}}>
-                <View>
-                    <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.Note}</Text>
-                    <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.Subject}</Text>
-                    <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.StartTime}</Text>
-                    <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.EndTime}</Text>
-                    <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.Date}</Text>
+            <TouchableRipple style={{ marginTop: 10 }} key={`${item.Subject}${index}`} borderless={true} rippleColor={'#FFF903'} onPress={() => {setVisibleOS(true); setCurrentNote(item)}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <VerticalLine/>
+                    <View style = {styles.teacher}>
+                        <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.Note}</Text>
+                        <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.Subject}</Text>
+                        <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.StartTime}</Text>
+                        <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.EndTime}</Text>
+                        <Text style = {{ alignSelf: 'center', color: 'black' }}>{item.Date}</Text>
+                    </View>
+                    <VerticalLine/>
                 </View>
             </TouchableRipple>
         )
@@ -89,12 +98,12 @@ export const NotesScreen = ({ navigation }) => {
     }
 
     return (
-        <View style={{ backgroundColor: isDarkMode ? Colors.darker : Colors.lighter, height: '100%'}}>
+        <View style={[styles.mainContainer, {backgroundColor: isDarkMode ? Colors.darker : Colors.lighter}]}>
             <FlatList data={subjectCountNotes} renderItem={renderItem} keyExtractor={itemKeyExtractor} />
 
             <AddButton navigation={navigation} screen='AddNote'/>
 
-            <Toast position='bottom' visibilityTime={2000} config={toastConfig}/>
+            <Toast position='top' visibilityTime={2000} config={toastConfig}/>
 
             <BottomMenu 
                 title={'Выбранный предмет'}
@@ -130,3 +139,27 @@ export const NotesScreen = ({ navigation }) => {
         </View>
     )
 }
+
+const styles = StyleSheet.create({
+    mainContainer: {
+        height: '100%', 
+        padding: 10
+    },
+    subject: {
+        flexDirection: 'row', 
+        justifyContent: 'space-between',
+        backgroundColor: '#95276E', 
+        borderRadius: 10, 
+        padding: 5,
+        width: 150
+    },
+    teacher: {
+        flexDirection: 'column',
+        justifyContent: 'space-between', 
+        backgroundColor: '#8471D8', 
+        borderRadius: 15, 
+        paddingLeft: 8, 
+        paddingRight: 8, 
+        padding: 2
+      }
+  })
